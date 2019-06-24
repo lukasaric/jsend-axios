@@ -2,7 +2,7 @@
   "name": "jsend-axios",
   "version": "1.0.0",
   "description": "JSend interceptor for axios",
-  "main": "/src/request.js",
+  "main": "/src/JSendInterceptor.js",
   "bin": {},
   "scripts": {
     "lint": "eslint .",
