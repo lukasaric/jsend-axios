@@ -1,0 +1,11 @@
+.editorconfig
+.git*
+.jshint*
+.eslint*
+.npmignore
+.travis.yml
+renovate.json
+.vscode*
+*.config.js
+src/*
+tests/*
