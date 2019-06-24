@@ -5,7 +5,7 @@ JSend interceptor provides custom client response handling using `axios.intercep
 It, also normalizes response by reassigning response `data` property even if `jsend` is not implemented yet.
 
 
-## Run
+## Installation :books:
 ```
 npm install jsend-axios
 ```
