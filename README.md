@@ -13,7 +13,7 @@ npm install jsend-axios
 ## Usage
 ```
 import axios from 'axios';
-import jsendAxios from 'jsend-axios';
+import JSendInterceptor from 'jsend-axios';
 
 const client = axios.create();
 
