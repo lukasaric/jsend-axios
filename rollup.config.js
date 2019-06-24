@@ -6,7 +6,7 @@ import path from 'path';
 import resolve from 'rollup-plugin-node-resolve';
 
 const baseConfig = {
-  input: 'src/JSendInterceptor.js',
+  input: './src/JSendInterceptor.js',
   external: builtinModules.concat(Object.keys(dependencies)),
   plugins: [
     resolve({ preferBuiltins: true }),
@@ -15,17 +15,18 @@ const baseConfig = {
   ]
 };
 
+/** @type {Array<import('rollup').RollupOptions>} */
 const config = [{
   ...baseConfig,
   output: {
     format: 'esm',
-    file: path.join(__dirname, 'dist/JSendIterceptor.esm.js')
+    file: path.join(__dirname, 'dist/JSendInterceptor.esm.js')
   }
 }, {
   ...baseConfig,
   output: {
     format: 'cjs',
-    file: path.join(__dirname, 'dist/JSendIterceptor.js'),
+    file: path.join(__dirname, 'dist/JSendInterceptor.js'),
     exports: 'named'
   }
 }];

@@ -2,10 +2,11 @@
   "name": "jsend-axios",
   "version": "1.0.0",
   "description": "JSend interceptor for axios",
-  "main": "src/JSendInterceptor.js",
-  "bin": {},
+  "main": "dist/JSendInterceptor.js",
+  "module": "dist/JSendInterceptor.esm.js",
   "scripts": {
     "lint": "eslint .",
+    "prebuild": "del-cli dist",
     "build": "rollup -c rollup.config.js",
     "test": "jest"
   },
@@ -31,7 +32,8 @@
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
     "@babel/preset-env": "^7.4.5",
-    "eslint": "^5.16.0",
+    "del-cli": "^2.0.0",
+    "eslint": "^6.0.0",
     "eslint-config-semistandard": "^13.0.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.17.3",
