@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import axios from 'axios';
-import jsend from 'jsend';
+import JSend from 'jsend';
 import JSendInterceptor, { JSendError } from '..';
 import nock from 'nock';
 
@@ -20,24 +20,25 @@ describe('JSend axios interceptor', () => {
   });
 
   describe('Response with JSend status `success`', () => {
-    it('Should return successful response with data and status', done => {
+    it('Should return successful response with JSend status and data attached', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, jsend.success('foo'));
+        .reply(200, JSend.success('foo'));
 
       client.get('/test')
         .then(res => {
           expect(res.jsend.status).toBe('success');
+          expect(res.data).toBe('foo');
           done();
         }, done.fail);
     });
   });
 
   describe('Response with JSend status `fail`', () => {
-    it('Should return failed response with data and status', done => {
+    it('Should throw JSendError with status `fail`', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, jsend.fail('foo'));
+        .reply(200, JSend.fail('foo'));
 
       client.get('/test')
         .catch(err => {
@@ -50,10 +51,10 @@ describe('JSend axios interceptor', () => {
   });
 
   describe('Response with JSend status `error`', () => {
-    it('Should return error response with status and message (code and data optional)', done => {
+    it('Should throw JSendError with status `error` and original error message', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, jsend.error({ message: 'Something went wrong!', code: 404, data: false }));
+        .reply(200, JSend.error({ message: 'Something went wrong!', code: 404 }));
 
       client.get('/test')
         .catch(err => {
@@ -79,11 +80,25 @@ describe('JSend axios interceptor', () => {
     });
   });
 
-  describe('Response with http error status and JSend status `success`', () => {
-    it('Should throw error with `jsend` status and data', done => {
+  describe('Invalid JSend payload', () => {
+    it('Should pass-through http response', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, jsend.success('foo'));
+        .reply(200, { data: 'foo' });
+
+      client.get('/test')
+        .then(res => {
+          expect(res).not.toHaveProperty('jsend');
+          done();
+        }, done.fail);
+    });
+  });
+
+  describe('Response with http error status and JSend status `success`', () => {
+    it('Should throw AxiosError with JSend status and data attached', done => {
+      nock(BASE_URL)
+        .get('/test')
+        .reply(400, JSend.success('foo'));
 
       client.get('/test')
         .catch(err => {
@@ -96,10 +111,10 @@ describe('JSend axios interceptor', () => {
   });
 
   describe('Response with http error status and JSend status `fail`', () => {
-    it('Should throw error with `jsend` status and data', done => {
+    it('Should throw JSendError with status `fail`', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, jsend.fail('foo'));
+        .reply(400, JSend.fail('foo'));
 
       client.get('/test')
         .catch(err => {
@@ -111,15 +126,30 @@ describe('JSend axios interceptor', () => {
   });
 
   describe('Response with http error status and JSend status `error`', () => {
-    it('Should throw error with `jsend` status and message (code and data optional)', done => {
+    it('Should throw JSendError with status `error` and original error message', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, jsend.error({ message: 'Something went wrong!', code: 400, data: false }));
+        .reply(400, JSend.error({ message: 'Something went wrong!', code: 400 }));
 
       client.get('/test')
         .catch(err => {
           expect(err).toBeInstanceOf(JSendError);
           expect(err.jsend.status).toBe('error');
+          done();
+        }, done.fail);
+    });
+  });
+
+  describe('Response with http error status and invalid JSend payload', () => {
+    it('Should pass-through http error', done => {
+      nock(BASE_URL)
+        .get('/test')
+        .reply(400, { data: 'foo' });
+
+      client.get('/test')
+        .catch(err => {
+          expect(err.isAxiosError).toBe(true);
+          expect(err).not.toHaveProperty('jsend');
           done();
         }, done.fail);
     });

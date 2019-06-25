@@ -1,25 +1,41 @@
+import JSend from 'jsend';
 import JSendError from './JSendError';
 
-export function throwJSendError(response) {
-  const { data, ...jsend } = response.data;
-  Object.assign(response, { data, jsend });
-  if (jsend.status === 'success') return response;
-  if (jsend.status === 'fail') throw new JSendError('Request failed', response);
-  throw new JSendError(`Request returned an error: ${jsend.message}`, response);
-}
+const JSEND_FIELDS = ['status', 'code', 'data', 'message'];
 
 export default function apply(axios) {
   return axios.interceptors.response.use(
-    res => throwJSendError(res),
+    response => {
+      if (!response.data) return response;
+      if (!JSend.isValid(response.data)) return response;
+      const { data, ...jsend } = pick(JSEND_FIELDS, response.data);
+      if (jsend.status !== 'success') throw createError(jsend, response);
+      Object.assign(response, { jsend, data });
+      return response;
+    },
     err => {
       if (!err.response || !err.response.data) throw err;
-      if (err.response.data.status !== 'success') {
-        return throwJSendError(err.response);
-      }
-      const { data, ...jsend } = err.response.data;
-      Object.assign(err, { data, jsend });
+      if (!JSend.isValid(err.response.data)) throw err;
+      const { data, ...jsend } = pick(JSEND_FIELDS, err.response.data);
+      if (jsend.status !== 'success') throw createError(jsend, err.response);
+      Object.assign(err, { jsend, data });
       throw err;
     });
 }
 
 export { JSendError };
+
+function createError(jsend, response) {
+  response = Object.assign({}, response, { jsend });
+  if (jsend.status === 'fail') {
+    return new JSendError('Request failed', response);
+  }
+  return new JSendError(`Request returned an error: ${jsend.message}`, response);
+}
+
+function pick(props, obj) {
+  return props.reduce((acc, key) => {
+    if (!obj.hasOwnProperty(key)) return acc;
+    return Object.assign(acc, { [key]: obj[key] });
+  }, {});
+}
