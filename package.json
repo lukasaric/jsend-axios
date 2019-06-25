@@ -10,7 +10,9 @@
     "build": "rollup -c rollup.config.js",
     "pretest": "npm run build",
     "test": "jest",
-    "test:debug": "npm run pretest && node --inspect-brk node_modules/.bin/jest --runInBand"
+    "test:debug": "npm run pretest && node --inspect-brk node_modules/.bin/jest --runInBand",
+    "prepublishOnly": "npm run build",
+    "release": "np"
   },
   "keywords": [],
   "repository": {
@@ -45,6 +47,7 @@
     "jest": "^24.8.0",
     "jsend": "^1.0.2",
     "nock": "^10.0.6",
+    "np": "^5.0.3",
     "rollup": "^1.16.2",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.0.0",
