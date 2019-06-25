@@ -21,7 +21,7 @@
     "name": "Luka Saric",
     "url": "https://github.com/lukasaric"
   },
-  "license": "LICENSE",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/lukasaric/jsend-axios/issues"
   },
