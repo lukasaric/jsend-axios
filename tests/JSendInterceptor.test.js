@@ -23,12 +23,12 @@ describe('JSend axios interceptor', () => {
     it('Should return original http response with JSend status and data attached', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, JSend.success('foo'));
+        .reply(200, JSend.success({ foo: 'bar' }));
 
       client.get('/test')
         .then(res => {
           expect(res.jsend.status).toBe('success');
-          expect(res.data).toBe('foo');
+          expect(res.data).toStrictEqual({ foo: 'bar' });
           done();
         }, done.fail);
     });
@@ -38,13 +38,15 @@ describe('JSend axios interceptor', () => {
     it('Should throw JSendError with status `fail`', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, JSend.fail('foo'));
+        .reply(200, JSend.fail({ foo: 'bar' }));
 
       client.get('/test')
         .catch(err => {
           expect(err).toBeInstanceOf(JSendError);
           expect(err.jsend.status).toBe('fail');
           expect(err.message).toBe('Request failed');
+          expect(err.data).toStrictEqual({ foo: 'bar' });
+          expect(err.response).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });
@@ -54,13 +56,15 @@ describe('JSend axios interceptor', () => {
     it('Should throw JSendError with status `error` and original error message', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, JSend.error({ message: 'Something went wrong!', code: 404 }));
+        .reply(200, JSend.error({ message: 'Something went wrong!', code: 404, data: { foo: 'bar' } }));
 
       client.get('/test')
         .catch(err => {
           expect(err).toBeInstanceOf(JSendError);
           expect(err.jsend.status).toBe('error');
+          expect(err.jsend.code).toBe(404);
           expect(err.message).toBe('Request returned an error: Something went wrong!');
+          expect(err.response).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });
@@ -70,11 +74,12 @@ describe('JSend axios interceptor', () => {
     it('Should pass-through http response', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, { data: 'foo' });
+        .reply(200, { data: { foo: 'bar' } });
 
       client.get('/test')
         .then(res => {
           expect(res).not.toHaveProperty('jsend');
+          expect(res).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });
@@ -84,13 +89,14 @@ describe('JSend axios interceptor', () => {
     it('Should re-throw original http error with JSend status and data attached', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, JSend.success('foo'));
+        .reply(400, JSend.success({ foo: 'bar' }));
 
       client.get('/test')
         .catch(err => {
           expect(err.isAxiosError).toBe(true);
           expect(err.jsend.status).toBe('success');
-          expect(err.data).toBe('foo');
+          expect(err.data).toStrictEqual({ foo: 'bar' });
+          expect(err.response).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });
@@ -100,12 +106,15 @@ describe('JSend axios interceptor', () => {
     it('Should throw JSendError with status `fail`', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, JSend.fail('foo'));
+        .reply(400, JSend.fail({ foo: 'bar' }));
 
       client.get('/test')
         .catch(err => {
           expect(err).toBeInstanceOf(JSendError);
           expect(err.jsend.status).toBe('fail');
+          expect(err.message).toBe('Request failed');
+          expect(err.data).toStrictEqual({ foo: 'bar' });
+          expect(err.response).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });
@@ -115,12 +124,15 @@ describe('JSend axios interceptor', () => {
     it('Should throw JSendError with status `error` and original error message', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, JSend.error({ message: 'Something went wrong!', code: 400 }));
+        .reply(400, JSend.error({ message: 'Something went wrong!', code: 400, data: { foo: 'bar' } }));
 
       client.get('/test')
         .catch(err => {
           expect(err).toBeInstanceOf(JSendError);
           expect(err.jsend.status).toBe('error');
+          expect(err.jsend.code).toBe(400);
+          expect(err.message).toBe('Request returned an error: Something went wrong!');
+          expect(err.response).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });
@@ -130,12 +142,13 @@ describe('JSend axios interceptor', () => {
     it('Should pass-through http error', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(400, { data: 'foo' });
+        .reply(400, { data: { foo: 'bar' } });
 
       client.get('/test')
         .catch(err => {
           expect(err.isAxiosError).toBe(true);
           expect(err).not.toHaveProperty('jsend');
+          expect(err.response).toHaveProperty('data.data.foo');
           done();
         }, done.fail);
     });

@@ -9,7 +9,7 @@ export default function apply(axios) {
       if (!response.data) return response;
       if (!JSend.isValid(response.data)) return response;
       const { data, ...jsend } = pick(JSEND_FIELDS, response.data);
-      if (jsend.status !== 'success') throw createError(jsend, response);
+      if (jsend.status !== 'success') throw createError(response, { jsend, data });
       Object.assign(response, { jsend, data });
       return response;
     },
@@ -17,7 +17,7 @@ export default function apply(axios) {
       if (!err.response || !err.response.data) throw err;
       if (!JSend.isValid(err.response.data)) throw err;
       const { data, ...jsend } = pick(JSEND_FIELDS, err.response.data);
-      if (jsend.status !== 'success') throw createError(jsend, err.response);
+      if (jsend.status !== 'success') throw createError(err.response, { jsend, data });
       Object.assign(err, { jsend, data });
       throw err;
     });
@@ -25,12 +25,12 @@ export default function apply(axios) {
 
 export { JSendError };
 
-function createError(jsend, response) {
-  response = Object.assign({}, response, { jsend });
+function createError(response, { jsend, data }) {
+  const options = { jsend, data, response };
   if (jsend.status === 'fail') {
-    return new JSendError('Request failed', response);
+    return new JSendError('Request failed', options);
   }
-  return new JSendError(`Request returned an error: ${jsend.message}`, response);
+  return new JSendError(`Request returned an error: ${jsend.message}`, options);
 }
 
 function pick(props, obj) {

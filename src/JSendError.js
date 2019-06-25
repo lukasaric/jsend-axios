@@ -1,15 +1,16 @@
 import enhanceError from 'axios/lib/core/enhanceError';
 
 class JSendError extends Error {
-  constructor(message, response) {
+  constructor(message, { jsend, data, response }) {
     super(message);
-    const { config, request, jsend } = response;
+    const { config, request } = response;
     const { toJSON, ...info } = enhanceError({}, config, null, request, response);
     Object.assign(this, info, {
       jsend,
+      data,
       toJSON() {
         const json = toJSON.call(this);
-        return Object.assign(json, { jsend });
+        return Object.assign(json, { jsend, data });
       }
     });
   }
