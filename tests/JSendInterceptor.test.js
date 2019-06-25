@@ -1,20 +1,22 @@
-/* eslint-disable no-undef */
+/* eslint-env jest */
+
 import axios from 'axios';
-import JSendInterceptor from '../src/JSendInterceptor';
+import JSendInterceptor from '..';
 import nock from 'nock';
 
-const BASE_URL = 'http://example.com';
-
-const axiosConfig = {
-  baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json' }
-};
+const BASE_URL = 'https://example.com';
 
 function responseInterceptor(client) {
   client.interceptors.response.use(res => JSendInterceptor(res), err => Promise.reject(err));
 }
 
 describe('JSend axios interceptor', () => {
+  const client = axios.create({
+    baseURL: BASE_URL,
+    headers: { 'Content-Type': 'application/json' }
+  });
+  responseInterceptor(client);
+
   afterEach(() => {
     nock.cleanAll();
     nock.enableNetConnect();
@@ -22,14 +24,11 @@ describe('JSend axios interceptor', () => {
 
   describe('Response with JSend status `success`', () => {
     it('Should return successful response with data and status', done => {
-      const client = axios.create(axiosConfig);
-      nock('http://example.com')
+      nock(BASE_URL)
         .get('/test')
         .reply(200, { data: 'foo', status: 'success' });
 
-      responseInterceptor(client);
-
-      client.get('http://example.com/test')
+      client.get('/test')
         .then(res => {
           expect(res.jsend.status).toBe('success');
           done();
@@ -39,14 +38,11 @@ describe('JSend axios interceptor', () => {
 
   describe('Response with JSend status `fail`', () => {
     it('Should return failed response with data and status', done => {
-      const client = axios.create(axiosConfig);
-      nock('http://example.com')
+      nock(BASE_URL)
         .get('/test')
         .reply(200, { data: 'foo', status: 'fail' });
 
-      responseInterceptor(client);
-
-      client.get('http://example.com/test')
+      client.get('/test')
         .catch(err => {
           expect(err.jsend.status).toBe('fail');
           done();
@@ -56,14 +52,11 @@ describe('JSend axios interceptor', () => {
 
   describe('Response with JSend status `error`', () => {
     it('Should return error response with status and message (code and data optional)', done => {
-      const client = axios.create(axiosConfig);
-      nock('http://example.com')
+      nock(BASE_URL)
         .get('/test')
         .reply(200, { data: false, status: 'error', message: 'Something went wrong!', code: 404 });
 
-      responseInterceptor(client);
-
-      client.get('http://example.com/test')
+      client.get('/test')
         .catch(err => {
           expect(err.jsend.status).toBe('error');
           done();

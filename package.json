@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "prebuild": "del-cli dist",
     "build": "rollup -c rollup.config.js",
+    "pretest": "npm run build",
     "test": "jest"
   },
   "keywords": [],
