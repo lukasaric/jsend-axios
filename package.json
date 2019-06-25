@@ -14,7 +14,11 @@
     "prepublishOnly": "npm run build",
     "release": "np"
   },
-  "keywords": [],
+  "keywords": [
+    "jsend",
+    "axios",
+    "interceptor"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/lukasaric/jsend-axios.git"
