@@ -9,7 +9,8 @@
     "prebuild": "del-cli dist",
     "build": "rollup -c rollup.config.js",
     "pretest": "npm run build",
-    "test": "jest"
+    "test": "jest",
+    "test:debug": "npm run pretest && node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "keywords": [],
   "repository": {
