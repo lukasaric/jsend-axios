@@ -1,6 +1,7 @@
 /* eslint-env jest */
 
 import axios from 'axios';
+import jsend from 'jsend';
 import JSendInterceptor from '..';
 import nock from 'nock';
 
@@ -26,7 +27,7 @@ describe('JSend axios interceptor', () => {
     it('Should return successful response with data and status', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, { data: 'foo', status: 'success' });
+        .reply(200, jsend.success('foo'));
 
       client.get('/test')
         .then(res => {
@@ -40,7 +41,7 @@ describe('JSend axios interceptor', () => {
     it('Should return failed response with data and status', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, { data: 'foo', status: 'fail' });
+        .reply(200, jsend.fail('foo'));
 
       client.get('/test')
         .catch(err => {
@@ -54,7 +55,7 @@ describe('JSend axios interceptor', () => {
     it('Should return error response with status and message (code and data optional)', done => {
       nock(BASE_URL)
         .get('/test')
-        .reply(200, { data: false, status: 'error', message: 'Something went wrong!', code: 404 });
+        .reply(200, jsend.error({ message: 'Something went wrong!', code: 404 }));
 
       client.get('/test')
         .catch(err => {
