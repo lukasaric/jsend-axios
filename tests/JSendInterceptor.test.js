@@ -7,16 +7,12 @@ import nock from 'nock';
 
 const BASE_URL = 'https://example.com';
 
-function responseInterceptor(client) {
-  client.interceptors.response.use(res => JSendInterceptor(res), err => Promise.reject(err));
-}
-
 describe('JSend axios interceptor', () => {
   const client = axios.create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' }
   });
-  responseInterceptor(client);
+  JSendInterceptor(client);
 
   afterEach(() => {
     nock.cleanAll();
