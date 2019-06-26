@@ -11,6 +11,7 @@
     "pretest": "npm run build",
     "test": "jest",
     "test:debug": "npm run pretest && node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test:cov": "codecov",
     "prepublishOnly": "npm run build",
     "release": "np"
   },
