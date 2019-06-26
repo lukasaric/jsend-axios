@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import JSend from 'jsend';
-import JSendInterceptor, { JSendError } from '..';
+import JSendInterceptor, { JSendError } from '../src/JSendInterceptor';
 import nock from 'nock';
 
 const BASE_URL = 'https://example.com';
