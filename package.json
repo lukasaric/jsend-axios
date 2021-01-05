@@ -39,7 +39,7 @@
     "collectCoverage": true
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "jsend": "^1.0.2"
   },
   "devDependencies": {
